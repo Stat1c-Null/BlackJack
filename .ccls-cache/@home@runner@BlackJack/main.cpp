@@ -61,6 +61,8 @@ int main() {
   int potentialPlayerScore = 0;
   int dealerScore = 0;
   int potentialDealerScore = 0;
+  bool dealerBlackJack = false;
+  bool playerBlackJack = false;
 
   // Create BlackJack deck of 6 individual card decks. Copy each deck into
   // currentDeck list 6 times
@@ -84,6 +86,8 @@ int main() {
     move = "";
     playerScore = 0;
     dealerScore = 0;
+    dealerBlackJack = false;
+    playerBlackJack = false;
 
     std::cout << "\nYou have $" << std::to_string(money) << std::endl;
     std::cout << "Enter your bet: " << std::endl;
@@ -102,7 +106,7 @@ int main() {
       playerScore += playerResult.first;
       potentialPlayerScore += playerResult.second;
 
-      //Calculate Computer Score
+      //Calculate Dealers Score
       std::pair<int, int> dealerResult = calculateScore(currentDeck[cardCounter+1]);
       dealerScore += dealerResult.first;
       potentialDealerScore += dealerResult.second;
@@ -134,8 +138,22 @@ int main() {
     std::cout <<"\n" <<  dealerScore << std::endl;
     std::cout << potentialDealerScore << std::endl;
 
+    //Check if dealer or player got BlackJack in the beginning
+    if(dealerScore == 21 && playerScore == 21) {
+      std::cout << "\n Tie, both player and dealer got Black Jack" << std::endl;
+      money += bet;
+      dealerBlackJack = true;
+      playerBlackJack = true;
+    } else if(dealerScore == 21) { 
+      std::cout << "\nDealer got Black Jack. You lost!" << std::endl;
+      dealerBlackJack = true;
+    } else if(dealerScore == 21) { 
+      std::cout << "\nPlayer got Black Jack. You lost!" << std::endl;
+      playerBlackJack = true;
+    }
+
     // Player move
-    while (move != "s") {
+    while (move != "s" && !playerBlackJack && !dealerBlackJack) {
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
     }
