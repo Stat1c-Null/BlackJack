@@ -35,6 +35,10 @@ std::pair <int, int> calculateScore(std::string card){
   return std::make_pair(score, potentialScore);
 }
 
+void showHands() {
+  
+}
+
 int main() {
   std::array<std::string, 52> cards = {
       "2H",     "3H",     "4H",     "5H",     "6H",    "7H",   "8H",
@@ -156,6 +160,10 @@ int main() {
     while (move != "s" && !playerBlackJack && !dealerBlackJack) {
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
+
+      if(move == "hit") {
+        playerHand.push_back(currentDeck[cardCounter]);
+      }
     }
   }
 }
