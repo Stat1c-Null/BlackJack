@@ -35,8 +35,29 @@ std::pair <int, int> calculateScore(std::string card){
   return std::make_pair(score, potentialScore);
 }
 
-void showHands() {
-  
+void showHands(std::vector<std::string> playerHand, std::vector<std::string> dealerHand, int playerScore, int dealerScore, int potentialPlayerScore, int potentialDealerScore, int dealerCounter) {
+  std::cout << "\nPlayer Hand: " << std::endl;
+  for (std::string value : playerHand) {
+    std::cout << value << "\t";
+  }
+  //DEBUG
+  std::cout << "\n" << playerScore << std::endl;
+  std::cout << potentialPlayerScore << std::endl;
+
+  // Show dealer cards
+  std::cout << "\n\nDealer Hand: " << std::endl;
+  for (std::string value : dealerHand) {
+    if (dealerCounter == 0) {
+      std::cout << value << "\t";
+    } else {
+      std::cout << "##"
+                << "\t";
+    }
+    dealerCounter++;
+  }
+  //DEBUG
+  std::cout <<"\n" <<  dealerScore << std::endl;
+  std::cout << potentialDealerScore << std::endl;
 }
 
 int main() {
@@ -117,9 +138,11 @@ int main() {
 
       cardCounter += 2;
     }
+
+    showHands();
     
     // Show player cards
-    std::cout << "\nPlayer Hand: " << std::endl;
+    /*std::cout << "\nPlayer Hand: " << std::endl;
     for (std::string value : playerHand) {
       std::cout << value << "\t";
     }
@@ -140,7 +163,7 @@ int main() {
     }
     //DEBUG
     std::cout <<"\n" <<  dealerScore << std::endl;
-    std::cout << potentialDealerScore << std::endl;
+    std::cout << potentialDealerScore << std::endl;*/
 
     //Check if dealer or player got BlackJack in the beginning
     if(dealerScore == 21 && playerScore == 21) {
