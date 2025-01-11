@@ -88,6 +88,8 @@ int main() {
   int potentialDealerScore = 0;
   bool dealerBlackJack = false;
   bool playerBlackJack = false;
+  bool playerBusted = false;
+  bool dealerBusted = false;
   std::string breaker = "-------------------------------";
 
   // Create BlackJack deck of 6 individual card decks. Copy each deck into
@@ -118,7 +120,6 @@ int main() {
     std::cout << "\nYou have $" << std::to_string(money) << std::endl;
     std::cout << "Enter your bet: " << std::endl;
     std::cin >> bet;
-    money -= bet;
     std::cout << "Your bet is $" << bet << std::endl;
 
     // Give cards to player and dealer. First player then dealer, then player,
@@ -142,29 +143,15 @@ int main() {
 
     showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
 
-    //Check if dealer or player got BlackJack in the beginning
-    //TODO: For some reason doesnt blackjack in the beginning doesnt work, investigate
-    if(dealerScore == 21 && playerScore == 21) {
-      std::cout << "\n Tie, both player and dealer got Black Jack" << std::endl;
-      money += bet;
-      dealerBlackJack = true;
-      playerBlackJack = true;
-    } else if(dealerScore == 21) { 
-      std::cout << "\nDealer got Black Jack. You lost!" << std::endl;
-      dealerBlackJack = true;
-    } else if(dealerScore == 21) { 
-      std::cout << "\nPlayer got Black Jack. You lost!" << std::endl;
-      playerBlackJack = true;
-    }
-
     // Player move
-    while (move != "s" && !playerBlackJack && !dealerBlackJack) {
+    while (move != "s" && !playerBlackJack && !dealerBlackJack && !playerBusted && !dealerBusted) {
+      
       std::cout << breaker << std::endl;
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
 
       //Player hit move
-      if(move == "hit") {
+      if(move == "h") {
         playerHand.push_back(currentDeck[cardCounter]);
 
         //Calculate Player Score
@@ -178,6 +165,31 @@ int main() {
         
         move = "";
       }
+
+      //Check if dealer or player got BlackJack or if they busted all over the table
+      //TODO: Turn this into a function so it can check in the beginning and at the end
+      if(dealerScore == 21 && playerScore == 21) {
+        std::cout << "\n Tie, both player and dealer got Black Jack" << std::endl;
+        money += bet;
+        dealerBlackJack = true;
+        playerBlackJack = true;
+      } else if(dealerScore == 21) { 
+        std::cout << "\nDealer got Black Jack. You lost!" << std::endl;
+        dealerBlackJack = true;
+        money -= bet;
+      } else if(playerScore == 21) { 
+        std::cout << "\nPlayer got Black Jack. You won!" << std::endl;
+        playerBlackJack = true;
+        money += bet * 1.5;
+      } else if(dealerScore > 21) { 
+        std::cout << "\nDealer got busted. You won!" << std::endl;
+        dealerBusted = true;
+        money += bet;
+      } else if(playerScore > 21) { 
+        std::cout << "\nPlayer got busted. You lost!" << std::endl;
+        playerBusted = true;
+        money -= bet;
+      } 
     }
   }
 }
