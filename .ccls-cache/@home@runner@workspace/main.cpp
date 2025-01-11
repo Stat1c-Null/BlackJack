@@ -157,7 +157,7 @@ int main() {
 
     // Player move
     while (move != "s" && !playerBlackJack && !dealerBlackJack) {
-      std::cout << std::string(10, "-") << std::endl;
+      std::cout << string(10, "-") << std::endl;
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
 
