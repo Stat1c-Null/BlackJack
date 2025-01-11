@@ -88,6 +88,7 @@ int main() {
   int potentialDealerScore = 0;
   bool dealerBlackJack = false;
   bool playerBlackJack = false;
+  std::string breaker = "-------------------------------";
 
   // Create BlackJack deck of 6 individual card decks. Copy each deck into
   // currentDeck list 6 times
@@ -142,6 +143,7 @@ int main() {
     showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
 
     //Check if dealer or player got BlackJack in the beginning
+    //TODO: For some reason doesnt blackjack in the beginning doesnt work, investigate
     if(dealerScore == 21 && playerScore == 21) {
       std::cout << "\n Tie, both player and dealer got Black Jack" << std::endl;
       money += bet;
@@ -157,24 +159,24 @@ int main() {
 
     // Player move
     while (move != "s" && !playerBlackJack && !dealerBlackJack) {
-      std::cout << string(10, "-") << std::endl;
+      std::cout << breaker << std::endl;
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
 
       //Player hit move
       if(move == "hit") {
         playerHand.push_back(currentDeck[cardCounter]);
-        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
-        
+
         //Calculate Player Score
         std::pair<int, int> playerResult = calculateScore(currentDeck[cardCounter]);
         playerScore += playerResult.first;
         potentialPlayerScore += playerResult.second;
+        
+        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
 
         cardCounter += 1;
         
         move = "";
-
       }
     }
   }
