@@ -157,14 +157,24 @@ int main() {
 
     // Player move
     while (move != "s" && !playerBlackJack && !dealerBlackJack) {
+      std::cout << "-" * 10 << std::endl;
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
 
+      //Player hit move
       if(move == "hit") {
         playerHand.push_back(currentDeck[cardCounter]);
         showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
+        
+        //Calculate Player Score
+        std::pair<int, int> playerResult = calculateScore(currentDeck[cardCounter]);
+        playerScore += playerResult.first;
+        potentialPlayerScore += playerResult.second;
+
         cardCounter += 1;
+        
         move = "";
+
       }
     }
   }
