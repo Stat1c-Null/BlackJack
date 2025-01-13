@@ -90,6 +90,9 @@ int main() {
   bool playerBlackJack = false;
   bool playerBusted = false;
   bool dealerBusted = false;
+  bool canDoubleDown = true;
+  bool playerMove = false;
+  //bool dealerMove = false;
   std::string breaker = "-------------------------------";
 
   // Create BlackJack deck of 6 individual card decks. Copy each deck into
@@ -116,6 +119,13 @@ int main() {
     dealerScore = 0;
     dealerBlackJack = false;
     playerBlackJack = false;
+    playerBusted = false;
+    dealerBusted = false;
+    canDoubleDown = true;
+    playerMove = true;
+    playerHand.clear();
+    dealerHand.clear();
+    
 
     std::cout << "\nYou have $" << std::to_string(money) << std::endl;
     std::cout << "Enter your bet: " << std::endl;
@@ -144,14 +154,17 @@ int main() {
     showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
 
     // Player move
-    while (move != "s" && !playerBlackJack && !dealerBlackJack && !playerBusted && !dealerBusted) {
+    while (move != "s" && !playerBlackJack && !dealerBlackJack && !playerBusted && !dealerBusted && playerMove) {
       
       std::cout << breaker << std::endl;
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
 
       //Player hit move
-      if(move == "h") {
+      if(move == "h" || move == "hit") {
+        canDoubleDown = false;
+
+        //TODO: Turn this into a function as well that can be used by player and dealer
         playerHand.push_back(currentDeck[cardCounter]);
 
         //Calculate Player Score
@@ -165,6 +178,33 @@ int main() {
         
         move = "";
       }
+      //Player Double Down Move
+      else if((move == "dd" || move == "double down") && canDoubleDown) {
+        //Increase the bet
+        bet = bet * 2;
+        
+        playerHand.push_back(currentDeck[cardCounter]);
+
+        //Calculate Player Score
+        std::pair<int, int> playerResult = calculateScore(currentDeck[cardCounter]);
+        playerScore += playerResult.first;
+        potentialPlayerScore += playerResult.second;
+
+        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
+
+        cardCounter += 1;
+
+        move = "";
+
+        playerMove = false;
+        //dealerMove = true;
+      }
+      //Player Stand
+      else if(move == "s") {
+        std::cout << "\nNo more cards for player" << std::endl;
+        playerMove = false;
+      }
+      
 
       //Check if dealer or player got BlackJack or if they busted all over the table
       //TODO: Turn this into a function so it can check in the beginning and at the end
