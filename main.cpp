@@ -35,7 +35,7 @@ std::pair <int, int> calculateScore(std::string card){
   return std::make_pair(score, potentialScore);
 }
 
-void showHands(std::vector<std::string> playerHand, std::vector<std::string> dealerHand, int playerScore, int dealerScore, int potentialPlayerScore, int potentialDealerScore, int dealerCounter) {
+void showHands(std::vector<std::string> playerHand, std::vector<std::string> dealerHand, int playerScore, int dealerScore, int potentialPlayerScore, int potentialDealerScore, int dealerCounter, bool dealerMove) {
   std::cout << "\nPlayer Hand: " << std::endl;
   for (std::string value : playerHand) {
     std::cout << value << "\t";
@@ -49,9 +49,10 @@ void showHands(std::vector<std::string> playerHand, std::vector<std::string> dea
   for (std::string value : dealerHand) {
     if (dealerCounter == 0) {
       std::cout << value << "\t";
-    } else {
-      std::cout << "##"
-                << "\t";
+    } else if(!dealerMove && dealerCounter > 0) {
+      std::cout << "##" << "\t";
+    } else if(dealerMove) {
+      std::cout << value << "\t";
     }
     dealerCounter++;
   }
@@ -92,7 +93,7 @@ int main() {
   bool dealerBusted = false;
   bool canDoubleDown = true;
   bool playerMove = false;
-  //bool dealerMove = false;
+  bool dealerMove = false;
   std::string breaker = "-------------------------------";
 
   // Create BlackJack deck of 6 individual card decks. Copy each deck into
@@ -123,6 +124,8 @@ int main() {
     dealerBusted = false;
     canDoubleDown = true;
     playerMove = true;
+    dealerMove = false;
+    dealerCounter = 0;
     playerHand.clear();
     dealerHand.clear();
     
@@ -151,11 +154,11 @@ int main() {
       cardCounter += 2;
     }
 
-    showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
+    showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter, dealerMove);
 
-    // Player move
-    while (move != "s" && !playerBlackJack && !dealerBlackJack && !playerBusted && !dealerBusted && playerMove) {
-      
+   //Player moves
+    while (move != "s" && !playerBlackJack && !dealerBlackJack && !playerBusted && playerMove) {
+      // Player move
       std::cout << breaker << std::endl;
       std::cout << "\nHit, Stand or Double Down ?" << std::endl;
       std::cin >> move;
@@ -172,7 +175,7 @@ int main() {
         playerScore += playerResult.first;
         potentialPlayerScore += playerResult.second;
         
-        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
+        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter, dealerMove);
 
         cardCounter += 1;
         
@@ -190,22 +193,22 @@ int main() {
         playerScore += playerResult.first;
         potentialPlayerScore += playerResult.second;
 
-        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter);
+        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter, dealerMove);
 
-        cardCounter += 1;
+        cardCounter++;
 
         move = "";
 
         playerMove = false;
-        //dealerMove = true;
+        dealerMove = true;
       }
       //Player Stand
-      else if(move == "s") {
+      else if(move == "s" || move == "stand") {
         std::cout << "\nNo more cards for player" << std::endl;
         playerMove = false;
+        dealerMove = true;
       }
       
-
       //Check if dealer or player got BlackJack or if they busted all over the table
       //TODO: Turn this into a function so it can check in the beginning and at the end
       if(dealerScore == 21 && playerScore == 21) {
@@ -229,7 +232,63 @@ int main() {
         std::cout << "\nPlayer got busted. You lost!" << std::endl;
         playerBusted = true;
         money -= bet;
+      } else if(dealerScore > playerScore) {
+        std::cout << "\nDealer's score is bigger, player lost" << std::endl;
+        playerBusted = true;
+        money -= bet;
+      } else if(dealerScore < playerScore) {
+        std::cout << "\nPlayer's score is higher, dealer lost" << std::endl;
+        dealerBusted = true;
+        money += bet;
+      }
+    }
+
+    //Dealer's turn
+    while(!dealerBlackJack && dealerMove && !dealerBusted && !playerBlackJack && !playerBusted && !dealerBlackJack) {
+      if(playerScore > dealerScore){
+        dealerHand.push_back(currentDeck[cardCounter]);
+
+        //Calculate Dealers Score
+        std::pair<int, int> dealerResult = calculateScore(currentDeck[cardCounter+1]);
+        dealerScore += dealerResult.first;
+        potentialDealerScore += dealerResult.second;
+
+        showHands(playerHand, dealerHand,playerScore, dealerScore, potentialPlayerScore, potentialDealerScore, dealerCounter, dealerMove);
+
+        cardCounter++;
+      }
+
+      if(dealerScore == 21 && playerScore == 21) {
+        std::cout << "\n Tie, both player and dealer got Black Jack" << std::endl;
+        money += bet;
+        dealerBlackJack = true;
+        playerBlackJack = true;
+      } else if(dealerScore == 21) { 
+        std::cout << "\nDealer got Black Jack. You lost!" << std::endl;
+        dealerBlackJack = true;
+        money -= bet;
+      } else if(playerScore == 21) { 
+        std::cout << "\nPlayer got Black Jack. You won!" << std::endl;
+        playerBlackJack = true;
+        money += bet * 1.5;
+      } else if(dealerScore > 21) { 
+        std::cout << "\nDealer got busted. You won!" << std::endl;
+        dealerBusted = true;
+        money += bet;
+      } else if(playerScore > 21) { 
+        std::cout << "\nPlayer got busted. You lost!" << std::endl;
+        playerBusted = true;
+        money -= bet;
       } 
+      else if(dealerScore > playerScore) {
+        std::cout << "\nDealer's score is bigger, player lost" << std::endl;
+        playerBusted = true;
+        money -= bet;
+      } else if(dealerScore < playerScore) {
+        std::cout << "\nPlayer's score is higher, dealer lost" << std::endl;
+        dealerBusted = true;
+        money += bet;
+      }
     }
   }
 }
